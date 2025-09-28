@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PERUM DHARMA ALAM</title>
+  <link rel="stylesheet" href="style2.css" />
+</head>
+<body>
+  <!-- background decorative -->
+  <img class="image-gradient" src="gradient.png" alt="gradient" />
+  <div class="layer-blur"></div>
+
+  <div class="container">
+    <!-- HEADER / NAVBAR -->
+    <header>
+      <div class="logo">
+        <img src="logoda.png" alt="logo" class="logo-img" />
+        <h1 class="logo">PERUM DHARMA ALAM</h1>
+      </div>
+
+      <nav>
+        <a href="#" id="btn-kontak">KONTAK</a>
+        <a href="#" id="btn-tentang">TENTANG</a>
+      </nav>
+
+      <a href="index.html" class="btn-signing">MBALEK</a>
+    </header>
+
+    <!-- 3 KOTAK: PHOTO - VIDEO - DATA WARGA (di bawah navbar) -->
+    <div class="container1">
+      <div class="photo-box" onclick="openGallery(0)">
+        <div class="photo">PHOTO</div>
+      </div>
+
+      <div class="video-box" onclick="openVideo()">
+        <div class="video">VIDEO</div>
+      </div>
+
+      <div class="kegiatan-box" onclick="openDataWarga()">
+        <div class="kegiatan">TLP PENTING</div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+      <div class="content">
+        <h1>eRTe WOLU<br />DHARMA ALAM JEMBER</h1>
+        <p class="description">Menyenangkan Kompak Guyub Geguyonan</p>
+
+        <div class="buttons">
+          <a href="#" class="btn-signing-main">UPLOAD &gt;</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- POPUP KONTAK (harus ada di HTML) -->
+  <div id="popup-kontak" class="popup-kontak" aria-hidden="true">
+    <div class="popup-content">
+      <h2>KONTAK</h2>
+      <p>Silakan hubungi kami di <br><b>0821-4100-9280</b></p>
+    </div>
+  </div>
+
+  <!-- POPUP TENTANG (harus ada di HTML) -->
+  <div id="popup-tentang" class="popup-kontak" aria-hidden="true">
+    <div class="popup-content">
+      <h2>TENTANG</h2>
+      <p>Website resmi RT 08 Perum Dharma Alam Jember.<br>Dibuat untuk guyub, rukun, kompak, dan geguyonan 😊</p>
+    </div>
+  </div>
+
+  <!-- MODAL: Gallery -->
+  <div id="galleryModal" class="modal">
+    <span class="close" onclick="closeGallery()">&times;</span>
+    <img id="galleryImg" src="" alt="gallery image" />
+    <div class="controls">
+      <button onclick="prevImage()">⟨ Prev</button>
+      <button onclick="nextImage()">Next ⟩</button>
+    </div>
+  </div>
+
+  <!-- MODAL: Data Warga -->
+  <div id="dataWargaModal" class="modal">
+    <span class="close" onclick="closeDataWarga()">&times;</span>
+    <div class="modal-content">
+      <h2>NO TLP PENTING</h2>
+      <table id="dataWargaTable" border="1" cellpadding="5">
+        <thead>
+          <tr>
+            <th>NAMA</th>
+            <th>JABATAN</th>
+            <th>NO WA</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCRIPT (letakkan di bawah supaya DOM sudah ada) -->
+  <script>
+    // GANTI path gambar sesuai foldermu
+    const images = [
+      "images/foto1.png",
+      "images/foto2.png",
+      "images/foto3.png"
+    ];
+    let currentIndex = 0;
+
+    function openGallery(index) {
+      currentIndex = index;
+      document.getElementById("galleryImg").src = images[currentIndex];
+      document.getElementById("galleryModal").style.display = "flex";
+    }
+
+    function closeGallery() {
+      document.getElementById("galleryModal").style.display = "none";
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % images.length;
+      document.getElementById("galleryImg").src = images[currentIndex];
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      document.getElementById("galleryImg").src = images[currentIndex];
+    }
+
+    // placeholder video open function (kamu bisa ganti ke modal atau page lain)
+    function openVideo() {
+      alert("Fungsi openVideo() dipanggil — tambahkan implementasi modal/video player sesuai kebutuhan.");
+    }
+
+    // Data warga (CSV)
+    function openDataWarga() {
+      const modal = document.getElementById("dataWargaModal");
+      modal.style.display = "flex";
+
+      fetch("data_warga.csv")
+        .then(res => {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        })
+        .then(csv => {
+          const rows = csv.trim().split("\n");
+          const tbody = document.querySelector("#dataWargaTable tbody");
+          tbody.innerHTML = "";
+          rows.slice(1).forEach(row => {
+            const cols = row.split(",");
+            const tr = document.createElement("tr");
+            cols.forEach(col => {
+              const td = document.createElement("td");
+              td.textContent = col;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(err => {
+          alert("Gagal load data_warga.csv. Pastikan menjalankan via server (Live Server). \nError: " + err);
+        });
+    }
+
+    function closeDataWarga() {
+      document.getElementById("dataWargaModal").style.display = "none";
+    }
+
+    // Tutup modal jika klik di luar konten (opsional)
+    window.addEventListener("click", function (e) {
+      const gm = document.getElementById("galleryModal");
+      const dm = document.getElementById("dataWargaModal");
+      if (e.target === gm) gm.style.display = "none";
+      if (e.target === dm) dm.style.display = "none";
+    });
+    /* KONTAK modal */
+    const btnKontak = document.getElementById('btn-kontak');
+    const popupKontak = document.getElementById('popup-kontak');
+    if (btnKontak && popupKontak) {
+      btnKontak.addEventListener('click', e => {
+        e.preventDefault();
+        popupKontak.classList.add('show');
+        popupKontak.setAttribute('aria-hidden','false');
+      });
+      popupKontak.addEventListener('click', e => {
+        if (e.target === popupKontak) popupKontak.classList.remove('show');
+      });
+    }
+
+    /* TENTANG modal */
+    const btnTentang = document.getElementById('btn-tentang');
+    const popupTentang = document.getElementById('popup-tentang');
+    if (btnTentang && popupTentang) {
+      btnTentang.addEventListener('click', e => {
+        e.preventDefault();
+        popupTentang.classList.add('show');
+        popupTentang.setAttribute('aria-hidden','false');
+      });
+      popupTentang.addEventListener('click', e => {
+        if (e.target === popupTentang) popupTentang.classList.remove('show');
+      });
+    }
+  </script>
+</body>
+</html>
